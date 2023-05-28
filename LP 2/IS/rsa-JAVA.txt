@@ -1,0 +1,121 @@
+package rsa;
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+			System.out.print("Enter first Prime No.: ");
+			int p = scanner.nextInt();
+
+			System.out.print("Enter second Prime No.: ");
+			int q = scanner.nextInt();
+
+			int[][] keypair = generateKeypair(p, q);
+			int[] publicKey = keypair[0];
+			int[] privateKey = keypair[1];
+
+			System.out.print("Enter PlainText: ");
+			scanner.nextLine(); // Clear the newline character from previous input
+			String plaintext = scanner.nextLine();
+
+			int[] ciphertext = encrypt(publicKey, plaintext);
+			String decryptedText = decrypt(privateKey, ciphertext);
+
+			System.out.println("Plaintext: " + plaintext);
+			System.out.print("Ciphertext: [");
+			for (int i = 0; i < ciphertext.length; i++) {
+			    System.out.print(ciphertext[i]);
+			    if (i != ciphertext.length - 1) {
+			        System.out.print(", ");
+			    }
+			}
+			System.out.println("]");
+			System.out.println("Decrypted text: " + decryptedText);
+		}
+    }
+
+    public static int[][] generateKeypair(int p, int q) {
+        int n = p * q;
+        int phi = (p - 1) * (q - 1);
+        Random random = new Random();
+        int e = random.nextInt(phi - 1) + 1;
+        int g = gcd(e, phi);
+
+        while (g != 1) {
+            e = random.nextInt(phi - 1) + 1;
+            g = gcd(e, phi);
+        }
+
+        int d = multiplicativeInverse(e, phi);
+
+        int[] publicKey = { e, n };
+        int[] privateKey = { d, n };
+
+        int[][] keypair = { publicKey, privateKey };
+        return keypair;
+    }
+
+    public static int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = a;
+            a = b;
+            b = temp % b;
+        }
+        return a;
+    }
+
+    public static int multiplicativeInverse(int e, int phi) {
+        int d = 0;
+        int x1 = 0;
+        int x2 = 1;
+        int y1 = 1;
+        int tempPhi = phi;
+
+        while (e > 0) {
+            int temp1 = tempPhi / e;
+            int temp2 = tempPhi - temp1 * e;
+            tempPhi = e;
+            e = temp2;
+            int x = x2 - temp1 * x1;
+            int y = d - temp1 * y1;
+            x2 = x1;
+            x1 = x;
+            d = y1;
+            y1 = y;
+        }
+
+        if (tempPhi == 1) {
+            return d + phi;
+        }
+
+        return 0; // Return 0 if no multiplicative inverse exists
+    }
+
+    public static int[] encrypt(int[] publicKey, String plaintext) {
+        int key = publicKey[0];
+        int n = publicKey[1];
+        int[] ciphertext = new int[plaintext.length()];
+
+        for (int i = 0; i < plaintext.length(); i++) {
+            char ch = plaintext.charAt(i);
+            ciphertext[i] = (int) Math.pow((int) ch, key) % n;
+        }
+
+        return ciphertext;
+    }
+
+    public static String decrypt(int[] privateKey, int[] ciphertext) {
+        int key = privateKey[0];
+        int n = privateKey[1];
+        StringBuilder plaintext = new StringBuilder();
+
+        for (int i = 0; i < ciphertext.length; i++) {
+            int num = ciphertext[i];
+            plaintext.append((char) (Math.pow(num, key) % n));
+        }
+
+        return plaintext.toString();
+    }
+}

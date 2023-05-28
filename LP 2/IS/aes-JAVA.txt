@@ -1,0 +1,44 @@
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+public class AESExample {
+    public static void main(String[] args) {
+        try {
+            // Encryption key
+            byte[] key = "C&F)H@McQfTjWnZr".getBytes("UTF-8");
+            
+            // Data to be encrypted
+            byte[] data = "Welcome to copyassignment.com!".getBytes("UTF-8");
+
+            // Create new instance of cipher
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+            IvParameterSpec ivSpec = new IvParameterSpec(new byte[cipher.getBlockSize()]);
+            
+            // Initialize cipher in encryption mode
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+
+            // Encrypt the data
+            byte[] ciphertext = cipher.doFinal(data);
+
+            // Print the encrypted data
+            System.out.print("Cipher text: ");
+            for (byte b : ciphertext) {
+                System.out.printf("\\x%02X", b);
+            }
+            System.out.println();
+
+            // Initialize cipher in decryption mode with the same key and nonce
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+            // Decrypt the data
+            byte[] plaintext = cipher.doFinal(ciphertext);
+
+            // Print the decrypted data
+            System.out.println("Plain text: " + new String(plaintext, "UTF-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

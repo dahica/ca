@@ -1,0 +1,248 @@
+package des;
+
+import java.util.HashMap;
+
+public class HexBinConverter {
+    // Hexadecimal to binary conversion
+    public static String hexToBin(String s) {
+        HashMap<Character, String> mp = new HashMap<>();
+        mp.put('0', "0000");
+        mp.put('1', "0001");
+        mp.put('2', "0010");
+        mp.put('3', "0011");
+        mp.put('4', "0100");
+        mp.put('5', "0101");
+        mp.put('6', "0110");
+        mp.put('7', "0111");
+        mp.put('8', "1000");
+        mp.put('9', "1001");
+        mp.put('A', "1010");
+        mp.put('B', "1011");
+        mp.put('C', "1100");
+        mp.put('D', "1101");
+        mp.put('E', "1110");
+        mp.put('F', "1111");
+
+        StringBuilder bin = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            bin.append(mp.get(s.charAt(i)));
+        }
+        return bin.toString();
+    }
+
+    // Binary to hexadecimal conversion
+    public static String binToHex(String s) {
+        HashMap<String, Character> mp = new HashMap<>();
+        mp.put("0000", '0');
+        mp.put("0001", '1');
+        mp.put("0010", '2');
+        mp.put("0011", '3');
+        mp.put("0100", '4');
+        mp.put("0101", '5');
+        mp.put("0110", '6');
+        mp.put("0111", '7');
+        mp.put("1000", '8');
+        mp.put("1001", '9');
+        mp.put("1010", 'A');
+        mp.put("1011", 'B');
+        mp.put("1100", 'C');
+        mp.put("1101", 'D');
+        mp.put("1110", 'E');
+        mp.put("1111", 'F');
+
+        StringBuilder hex = new StringBuilder();
+        for (int i = 0; i < s.length(); i += 4) {
+            String ch = s.substring(i, i + 4);
+            hex.append(mp.get(ch));
+        }
+        return hex.toString();
+    }
+
+    // Binary to decimal conversion
+    public static int binToDec(String binary) {
+        int decimal = 0;
+        int power = 0;
+        int i = binary.length() - 1;
+        while (i >= 0) {
+            int bit = binary.charAt(i--) - '0';
+            decimal += bit * Math.pow(2, power++);
+        }
+        return decimal;
+    }
+
+    // Decimal to binary conversion
+    public static String decToBin(int num) {
+        StringBuilder res = new StringBuilder(Integer.toBinaryString(num));
+        while (res.length() % 4 != 0) {
+            res.insert(0, '0');
+        }
+        return res.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Encryption");
+
+        String permutedText = "14A7D67818CA18AD";
+        System.out.println("After initial permutation " + permutedText);
+
+        String left = permutedText.substring(0, 8);
+        String right = permutedText.substring(8);
+        for (int round = 1; round <= 16; round++) {
+            System.out.print("Round " + round + "   ");
+            String nextLeft = right;
+
+            // Expansion permutation
+            String expandedRight = "";
+            expandedRight += right.charAt(0);
+            expandedRight += right.charAt(1);
+            expandedRight += right.charAt(3);
+            expandedRight += right.charAt(2);
+            expandedRight += right.charAt(3);
+            expandedRight += right.charAt(2);
+            expandedRight += right.charAt(4);
+            expandedRight += right.charAt(5);
+
+            // XOR with round key
+            String roundKey = "";
+            if (round == 1 || round == 2 || round == 9 || round == 16) {
+                roundKey = "000110110000001011101111111111000111000001110010";
+            } else {
+                roundKey = "000110110000001011101111111111000111000001110010".substring(2) + "0000000000000000";
+            }
+
+            String xoredRight = xor(expandedRight, roundKey);
+
+            // S-box substitution
+            String substitutedRight = "";
+            substitutedRight += sBox(xoredRight.substring(0, 6), 0);
+            substitutedRight += sBox(xoredRight.substring(6, 12), 1);
+            substitutedRight += sBox(xoredRight.substring(12, 18), 2);
+            substitutedRight += sBox(xoredRight.substring(18, 24), 3);
+
+            // Permutation
+            String permutedRight = "";
+            permutedRight += substitutedRight.charAt(15);
+            permutedRight += substitutedRight.charAt(6);
+            permutedRight += substitutedRight.charAt(19);
+            permutedRight += substitutedRight.charAt(20);
+            permutedRight += substitutedRight.charAt(28);
+            permutedRight += substitutedRight.charAt(11);
+            permutedRight += substitutedRight.charAt(27);
+            permutedRight += substitutedRight.charAt(16);
+            permutedRight += substitutedRight.charAt(0);
+            permutedRight += substitutedRight.charAt(14);
+            permutedRight += substitutedRight.charAt(22);
+            permutedRight += substitutedRight.charAt(25);
+            permutedRight += substitutedRight.charAt(4);
+            permutedRight += substitutedRight.charAt(17);
+            permutedRight += substitutedRight.charAt(30);
+            permutedRight += substitutedRight.charAt(9);
+
+            right = xor(left, permutedRight);
+            left = nextLeft;
+
+            System.out.println(left + "   " + right);
+        }
+
+        String ciphertext = right + left;
+        System.out.println("Cipher Text : " + binToHex(ciphertext));
+
+        // Decryption
+        System.out.println("Decryption");
+
+        System.out.println("After initial permutation " + ciphertext);
+
+        left = ciphertext.substring(0, 8);
+        right = ciphertext.substring(8);
+        for (int round = 1; round <= 16; round++) {
+            System.out.print("Round " + round + "   ");
+            String nextLeft = right;
+
+            // Expansion permutation
+            String expandedRight = "";
+            expandedRight += right.charAt(0);
+            expandedRight += right.charAt(1);
+            expandedRight += right.charAt(3);
+            expandedRight += right.charAt(2);
+            expandedRight += right.charAt(3);
+            expandedRight += right.charAt(2);
+            expandedRight += right.charAt(4);
+            expandedRight += right.charAt(5);
+
+            // XOR with round key
+            String roundKey = "";
+            if (round == 1 || round == 2 || round == 9 || round == 16) {
+                roundKey = "000110110000001011101111111111000111000001110010";
+            } else {
+                roundKey = "000110110000001011101111111111000111000001110010".substring(2) + "0000000000000000";
+            }
+
+            String xoredRight = xor(expandedRight, roundKey);
+
+            // S-box substitution
+            String substitutedRight = "";
+            substitutedRight += sBox(xoredRight.substring(0, 6), 4);
+            substitutedRight += sBox(xoredRight.substring(6, 12), 5);
+            substitutedRight += sBox(xoredRight.substring(12, 18), 6);
+            substitutedRight += sBox(xoredRight.substring(18, 24), 7);
+
+            // Permutation
+            String permutedRight = "";
+            permutedRight += substitutedRight.charAt(15);
+            permutedRight += substitutedRight.charAt(6);
+            permutedRight += substitutedRight.charAt(19);
+            permutedRight += substitutedRight.charAt(20);
+            permutedRight += substitutedRight.charAt(28);
+            permutedRight += substitutedRight.charAt(11);
+            permutedRight += substitutedRight.charAt(27);
+            permutedRight += substitutedRight.charAt(16);
+            permutedRight += substitutedRight.charAt(0);
+            permutedRight += substitutedRight.charAt(14);
+            permutedRight += substitutedRight.charAt(22);
+            permutedRight += substitutedRight.charAt(25);
+            permutedRight += substitutedRight.charAt(4);
+            permutedRight += substitutedRight.charAt(17);
+            permutedRight += substitutedRight.charAt(30);
+            permutedRight += substitutedRight.charAt(9);
+
+            right = xor(left, permutedRight);
+            left = nextLeft;
+
+            System.out.println(left + "   " + right);
+        }
+
+        String decryptedText = right + left;
+        System.out.println("Plain Text : " + binToHex(decryptedText));
+    }
+
+    // XOR operation on two binary strings
+    public static String xor(String a, String b) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < a.length(); i++) {
+            if (a.charAt(i) == b.charAt(i))
+                result.append("0");
+            else
+                result.append("1");
+        }
+        return result.toString();
+    }
+
+    // S-box substitution
+    public static String sBox(String input, int sBoxNumber) {
+    	String[][] sBox = {
+    		    {"1110", "0100", "1101", "0001", "0010", "1111", "1011", "1000", "0011", "1010", "0110", "1100", "0101", "1001", "0000", "0111"},
+    		    {"0000", "1111", "0111", "0100", "1110", "0010", "1101", "0001", "1010", "0110", "1100", "1011", "1001", "0101", "0011", "1000"},
+    		    {"0100", "0001", "1110", "1000", "1101", "0110", "0010", "1011", "1111", "1100", "1001", "0111", "0011", "1010", "0101", "0000"},
+    		    {"1111", "1100", "1000", "0010", "0100", "1001", "0001", "0111", "0101", "1011", "0011", "1110", "1010", "0000", "0110", "1101"},
+    		    {"0110", "1011", "0100", "0001", "0010", "1000", "1100", "1111", "1111", "0111", "0011", "1110", "0000", "1001", "1010", "0101"},
+    		    {"1010", "0000", "1111", "0100", "1110", "0011", "1000", "1101", "0111", "0110", "1001", "0001", "0101", "1011", "0010", "1100"},
+    		    {"1101", "0111", "0000", "1001", "0010", "0100", "1010", "1111", "1011", "1100", "0101", "0110", "1110", "0001", "0011", "1000"},
+    		    {"0001", "1010", "1101", "0000", "0110", "1001", "0100", "1011", "1111", "1000", "1000", "0111", "0011", "0101", "1110", "0010"}
+    		};
+
+
+        int row = binToDec(input.charAt(0) + "" + input.charAt(5));
+        int col = binToDec(input.substring(1, 5));
+        return sBox[sBoxNumber][row * 16 + col];
+    }
+}

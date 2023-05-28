@@ -1,0 +1,47 @@
+package transposition;
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+			System.out.print("Enter text: ");
+			String plaintext = scanner.nextLine();
+
+			System.out.print("Enter key: ");
+			int key = scanner.nextInt();
+
+			String encryptedMessage = columnarTranspositionEncrypt(plaintext, key);
+			String decryptedMessage = columnarTranspositionDecrypt(encryptedMessage, key);
+
+			System.out.println("Encrypted Message: " + encryptedMessage);
+			System.out.println("Decrypted Message: " + decryptedMessage);
+		}
+    }
+
+    public static String columnarTranspositionEncrypt(String plaintext, int key) {
+        int numColumns = (int) Math.ceil((double) plaintext.length() / key);
+        String paddedPlaintext = String.format("%-" + (numColumns * key) + "s", plaintext);
+        StringBuilder encryptedMessage = new StringBuilder();
+
+        for (int col = 0; col < key; col++) {
+            encryptedMessage.append(paddedPlaintext.substring(col, paddedPlaintext.length()));
+        }
+
+        return encryptedMessage.toString();
+    }
+
+    public static String columnarTranspositionDecrypt(String encryptedMessage, int key) {
+        int numColumns = (int) Math.ceil((double) encryptedMessage.length() / key);
+        StringBuilder decryptedMessage = new StringBuilder();
+
+        for (int col = 0; col < numColumns; col++) {
+            decryptedMessage.append(encryptedMessage.substring(col, encryptedMessage.length()));
+        }
+
+        decryptedMessage = new StringBuilder(decryptedMessage.toString().trim());
+
+        return decryptedMessage.toString();
+    }
+}
+

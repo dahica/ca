@@ -1,0 +1,26 @@
+import math
+def colmnar_transposition_encrypt(plaintext,key):
+    num_columns = math.ceil(len(plaintext)/key)
+    padded_plaintext = plaintext.ljust(num_columns*key)
+    encrypted_message = ''.join(padded_plaintext[col::key]for col in range (key))
+    return encrypted_message
+    
+def colmnar_transposition_decrypt(encrypted_message,key):
+    num_columns = math.ceil(len(encrypted_message)/key)
+    decrypted_message = ''.join(encrypted_message[col::num_columns]for col in range (num_columns))
+    decrypted_message = decrypted_message.rstrip()
+    return decrypted_message
+
+def main():
+    plaintext = input("enter text : ")
+    key = int(input("enter key : "))
+    
+    encrypted_message = colmnar_transposition_encrypt(plaintext,key)
+    decrypted_message = colmnar_transposition_decrypt(encrypted_message,key)
+    
+    print("Encrypted Message : ", encrypted_message)
+    print("Decrypted Message : ", decrypted_message)
+    
+    
+if __name__ == "__main__":
+    main()

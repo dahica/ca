@@ -1,0 +1,35 @@
+package helloworld9;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+			System.out.print("Enter String: ");
+			String input = scanner.nextLine();
+			input = input.replace("\n", ""); // Remove trailing newline character
+			
+			String original = input;
+			StringBuilder andResult = new StringBuilder(input);
+			StringBuilder xorResult = new StringBuilder(input);
+			
+			System.out.println("Original string: " + original);
+			System.out.print("AND result: ");
+			
+			// Perform AND operation on each character
+			for (int i = 0; i < andResult.length(); i++) {
+			    andResult.setCharAt(i, (char) (andResult.charAt(i) & 127));
+			    System.out.print(andResult.charAt(i));
+			}
+			
+			System.out.print("\nXOR result: ");
+			
+			// Perform XOR operation on each character
+			for (int i = 0; i < xorResult.length(); i++) {
+			    xorResult.setCharAt(i, (char) (xorResult.charAt(i) ^ 7));
+			    System.out.print(xorResult.charAt(i));
+			}
+		}
+        
+        System.out.println();
+    }
+}

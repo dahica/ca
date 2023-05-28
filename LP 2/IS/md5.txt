@@ -1,0 +1,28 @@
+package com.example;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class MD5 {
+    public static void main(String[] args) {
+        String text = "Hello World";
+        
+        try {
+            // Create MD5 instance
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            
+            // Calculate the message digest
+            byte[] digest = md.digest(text.getBytes());
+            
+            // Convert the digest to a hexadecimal string
+            String md5Hash = new BigInteger(1, digest).toString(16);
+            
+            // Print the MD5 hash
+            System.out.println("MD5 Hash: " + md5Hash);
+            
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+}

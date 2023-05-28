@@ -1,0 +1,45 @@
+def dfs(graph,node,visited):
+    if node not in visited:
+        print(node)
+        visited.add(node)
+        for neighbour in graph[node]:
+            dfs(graph,neighbour,visited)
+graph={
+    'A':['B','C'],
+    'B':['A','D','E'],
+    'C':['A','F','G'],
+    'D':['B'],
+    'E':['B'],
+    'F':['C'],
+    'G':['C']
+}
+
+dfs(graph,'A',set())
+
+
+graph={
+    'A':['B','C'],
+    'B':['A','D','E'],
+    'C':['A','F','G'],
+    'D':['B'],
+    'E':['B'],
+    'F':['C'],
+    'G':['C']
+}
+visited=[]
+queue=[]
+
+def bfs(visited,graph,node):
+    visited.append(node)
+    queue.append(node)
+    
+    while queue:
+        m = queue.pop(0)
+        print(m)
+        
+        for neighbour in graph[m]:
+            if neighbour not in visited:
+                visited.append(neighbour)
+                queue.append(neighbour)
+                
+bfs(visited,graph,'A')
