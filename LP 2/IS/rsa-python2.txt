@@ -1,0 +1,50 @@
+from math import gcd
+
+# Step 1
+#p = 3
+#q = 7
+p= int(input("Enter your value for p: "))
+print("p:",p)
+
+q = int(input("Enter your value for q: "))
+print("q:",q)
+
+# Step 2
+n = p * q
+print("n =", n)
+
+# Step 3
+phi = (p - 1) * (q - 1)
+
+# Step 4
+e = 2
+while e < phi:
+    if gcd(e, phi) == 1:
+        break
+    else:
+        e += 1
+
+print("e =", e)
+
+# Step 5
+k = 2
+d = ((k * phi) + 1) // e
+
+print("d =", d)
+print("Public key: (%d, %d)" % (e, n))
+print("Private key: (%d, %d)" % (d, n))
+
+# Plain text
+#msg = 11
+msg= int(input("Enter your value for msg: "))
+print("msg:",msg)
+
+print("Original message:", msg)
+
+# Encryption
+C = pow(msg, e, n)
+print("Encrypted message:", C)
+
+# Decryption
+M = pow(C, d, n)
+print("Decrypted message:", M)
